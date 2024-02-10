@@ -13,29 +13,33 @@ use Color::*;
 struct Side([[Color; 3]; 3]);
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-struct Cube([Side; 6]);
+struct Cube {
+    y: Side,
+    b: Side,
+    r: Side,
+    w: Side,
+    o: Side,
+    g: Side,
+}
 
 impl Cube {
+    fn new(y: Side, b: Side, r: Side, w: Side, o: Side, g: Side) -> Self {
+        Cube { y, b, r, w, o, g }
+    }
+
     fn default() -> Self {
-        let all_sides: [Side; 6] = [
+        Self::new(
             Side([[Yellow; 3]; 3]),
             Side([[Blue; 3]; 3]),
             Side([[Red; 3]; 3]),
             Side([[White; 3]; 3]),
             Side([[Orange; 3]; 3]),
             Side([[Green; 3]; 3]),
-        ];
-        Cube(all_sides)
+        )
     }
 }
 
-fn main() {
-
-    // all_sides = for color in Color::iter() {
-    //     side = [[color; 3]; 3];
-    // }
-    // RedSide = ;
-}
+fn main() {}
 
 #[cfg(test)]
 mod tests {
@@ -43,7 +47,7 @@ mod tests {
 
     #[test]
     fn test_default_cube() {
-        let default_cube = Cube([
+        let default_cube = Cube::new(
             Side([
                 [Yellow, Yellow, Yellow],
                 [Yellow, Yellow, Yellow],
@@ -65,8 +69,7 @@ mod tests {
                 [Green, Green, Green],
                 [Green, Green, Green],
                 [Green, Green, Green],
-            ]),
-        ]);
+            ]));
         assert_eq!(default_cube, Cube::default());
     }
 }
