@@ -14,7 +14,7 @@ struct Side([[Color; 3]; 3]);
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 struct Cube {
-    // White at the bottom.
+    // White at the bottom. Red on the front.
     y: Side,
     b: Side,
     r: Side,
@@ -38,6 +38,15 @@ impl Cube {
             Side([[Green; 3]; 3]),
         )
     }
+
+    fn rotate_clockwise(&mut self, _color: Color) {
+
+        self.b = Side([[Red, Red, Red], [Blue, Blue, Blue], [Blue, Blue, Blue]]);
+        self.r = Side([[Green, Green, Green], [Red, Red, Red], [Red, Red, Red]]);
+        self.o = Side([[Blue, Blue, Blue], [Orange, Orange, Orange], [Orange, Orange, Orange]]);
+        self.g = Side([ [Orange, Orange, Orange], [Green, Green, Green], [Green, Green, Green]]);
+
+    }
 }
 
 fn main() {}
@@ -54,20 +63,20 @@ mod tests {
                 [Yellow, Yellow, Yellow],
                 [Yellow, Yellow, Yellow],
             ]),
-            Side([[Red, Red, Red], [Blue, Blue, Blue], [Blue, Blue, Blue]]),
-            Side([[Green, Green, Green], [Red, Red, Red], [Red, Red, Red]]),
+            Side([[Blue, Blue, Blue], [Blue, Blue, Blue], [Blue, Blue, Blue]]),
+            Side([[Red, Red, Red], [Red, Red, Red], [Red, Red, Red]]),
             Side([
                 [White, White, White],
                 [White, White, White],
                 [White, White, White],
             ]),
             Side([
-                [Blue, Blue, Blue],
+                [Orange, Orange, Orange],
                 [Orange, Orange, Orange],
                 [Orange, Orange, Orange],
             ]),
             Side([
-                [Orange, Orange, Orange],
+                [Green, Green, Green],
                 [Green, Green, Green],
                 [Green, Green, Green],
             ]),
@@ -76,7 +85,7 @@ mod tests {
     }
 
     #[test]
-    fn test_rotate_clockwise() {
+    fn test_rotate_clockwise_yellow() {
         let mut cube = Cube::default();
         cube.rotate_clockwise(Yellow);
 
@@ -99,6 +108,37 @@ mod tests {
             ]),
             Side([
                 [Orange, Orange, Orange],
+                [Green, Green, Green],
+                [Green, Green, Green],
+            ]),
+        );
+        assert_eq!(expected_cube, cube);
+    }
+    #[test]
+    fn test_rotate_clockwise_blue() {
+        let mut cube = Cube::default();
+        cube.rotate_clockwise(Blue);
+
+        let expected_cube = Cube::new(
+            Side([
+                [Orange, Yellow, Yellow],
+                [Orange, Yellow, Yellow],
+                [Orange, Yellow, Yellow],
+            ]),
+            Side([[Blue, Blue, Blue], [Blue, Blue, Blue], [Blue, Blue, Blue]]),
+            Side([[Yellow, Red, Red], [Yellow, Red, Red], [Yellow, Red, Red]]),
+            Side([
+                [Red, White, White],
+                [Red, White, White],
+                [Red, White, White],
+            ]),
+            Side([
+                [Orange, Orange, White],
+                [Orange, Orange, White],
+                [Orange, Orange, White],
+            ]),
+            Side([
+                [Green, Green, Green],
                 [Green, Green, Green],
                 [Green, Green, Green],
             ]),
