@@ -26,6 +26,7 @@ impl Face {
     }
 }
 
+// TODO - Make it a hashmap instead.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 struct Cube {
     // White at the bottom. Red on the front.
@@ -53,19 +54,56 @@ impl Cube {
         )
     }
 
-    fn rotate_clockwise(&mut self, _color: Color) {
-        self.b = Face([[Red, Red, Red], [Blue, Blue, Blue], [Blue, Blue, Blue]]);
-        self.r = Face([[Green, Green, Green], [Red, Red, Red], [Red, Red, Red]]);
-        self.o = Face([
-            [Blue, Blue, Blue],
-            [Orange, Orange, Orange],
-            [Orange, Orange, Orange],
-        ]);
-        self.g = Face([
-            [Orange, Orange, Orange],
-            [Green, Green, Green],
-            [Green, Green, Green],
-        ]);
+    fn adjacent_faces(color: Color) -> [Color;4] {
+        match color {
+            Yellow => [Red, Blue, Orange, Green],
+            Blue => [Yellow, Red, White, Orange],
+            Red => [Yellow, Green, White, Blue],
+            Orange => [Yellow, Blue, White, Green],
+            White => [Red, Green, Orange, Blue],
+            Green => [Yellow, Orange, White, Red]
+        }
+    }
+
+    fn rotate_clockwise(&mut self, color: Color) {
+        match color {
+            Red    => self.r.transpose(),
+            Blue   => self.b.transpose(),
+            Yellow => self.y.transpose(),
+            Orange => self.o.transpose(),
+            White  => self.w.transpose(),
+            Green  => self.g.transpose()
+        }
+        let _adjacent_faces = Cube::adjacent_faces(color);
+        match color {
+            Yellow => {
+                let tmp = self.g.0[0];
+                self.g.0[0] = self.o.0[0];
+                self.o.0[0] = self.b.0[0];
+                self.b.0[0] = self.r.0[0];
+                self.r.0[0] = tmp;
+            },
+            Blue => {
+                let mut tmp = [White; 3];
+                for r in 0..=2 {
+                    tmp[r] = self.o.0[r][2];
+                    self.o.0[r][2] = self.w.0[2-r][0];
+
+                }
+                for r in 0..=2 {
+                    self.w.0[r][0] = self.r.0[r][0];
+                }
+                for r in 0..=2 {
+                    self.r.0[r][0] = self.y.0[r][0];
+                }
+                for r in 0..=2 {
+                    self.y.0[r][0] = tmp[r];
+                }
+            }
+            _ => {
+                unimplemented!();
+            }
+        }
     }
 }
 
