@@ -14,6 +14,7 @@ struct Side([[Color; 3]; 3]);
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 struct Cube {
+    // White at the bottom.
     y: Side,
     b: Side,
     r: Side,
@@ -53,23 +54,55 @@ mod tests {
                 [Yellow, Yellow, Yellow],
                 [Yellow, Yellow, Yellow],
             ]),
-            Side([[Blue, Blue, Blue], [Blue, Blue, Blue], [Blue, Blue, Blue]]),
-            Side([[Red, Red, Red], [Red, Red, Red], [Red, Red, Red]]),
+            Side([[Red, Red, Red], [Blue, Blue, Blue], [Blue, Blue, Blue]]),
+            Side([[Green, Green, Green], [Red, Red, Red], [Red, Red, Red]]),
             Side([
                 [White, White, White],
                 [White, White, White],
                 [White, White, White],
             ]),
             Side([
-                [Orange, Orange, Orange],
+                [Blue, Blue, Blue],
                 [Orange, Orange, Orange],
                 [Orange, Orange, Orange],
             ]),
             Side([
+                [Orange, Orange, Orange],
                 [Green, Green, Green],
                 [Green, Green, Green],
-                [Green, Green, Green],
-            ]));
+            ]),
+        );
         assert_eq!(default_cube, Cube::default());
+    }
+
+    #[test]
+    fn test_rotate_clockwise() {
+        let mut cube = Cube::default();
+        cube.rotate_clockwise(Yellow);
+
+        let expected_cube = Cube::new(
+            Side([
+                [Yellow, Yellow, Yellow],
+                [Yellow, Yellow, Yellow],
+                [Yellow, Yellow, Yellow],
+            ]),
+            Side([[Red, Red, Red], [Blue, Blue, Blue], [Blue, Blue, Blue]]),
+            Side([[Green, Green, Green], [Red, Red, Red], [Red, Red, Red]]),
+            Side([
+                [White, White, White],
+                [White, White, White],
+                [White, White, White],
+            ]),
+            Side([[Blue, Blue, Blue],
+                [Orange, Orange, Orange],
+                [Orange, Orange, Orange],
+            ]),
+            Side([
+                [Orange, Orange, Orange],
+                [Green, Green, Green],
+                [Green, Green, Green],
+            ]),
+        );
+        assert_eq!(expected_cube, cube);
     }
 }
