@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 #[derive(Debug, Hash, Clone, Copy, PartialEq, Eq)]
 enum Color {
     Yellow,
@@ -75,7 +73,7 @@ impl Cube {
         match sequence {
             "U" => {
                 self.up.transpose();
-                for i in 0..=2 {
+                for i in [0, 1, 2] {
                     let tmp = self.front.0[i];
                     self.front.0[i] = self.right.0[i];
                     self.right.0[i] = self.back.0[i];
@@ -83,15 +81,71 @@ impl Cube {
                     self.left.0[i] = tmp;
                 }
             }
+            "D" => {
+                self.down.transpose();
+                for i in [6, 7, 8] {
+                    let tmp = self.front.0[i];
+                    self.front.0[i] = self.left.0[i];
+                    self.left.0[i] = self.back.0[i];
+                    self.back.0[i] = self.right.0[i];
+                    self.right.0[i] = tmp;
+                }
+            }
             "L" => {
                 self.left.transpose();
                 for i in [0, 3, 6] {
                     let tmp = self.front.0[i];
                     self.front.0[i] = self.up.0[i];
-                    self.up.0[i] = self.back.0[i+2];
-                    self.back.0[i+2] = self.down.0[i];
+                    self.up.0[i] = self.back.0[i + 2];
+                    self.back.0[i + 2] = self.down.0[i];
                     self.down.0[i] = tmp;
                 }
+            }
+            "R" => {
+                self.right.transpose();
+                for i in [2, 5, 8] {
+                    let tmp = self.front.0[i];
+                    self.front.0[i] = self.down.0[i];
+                    self.down.0[i] = self.back.0[i - 2];
+                    self.back.0[i - 2] = self.up.0[i];
+                    self.up.0[i] = tmp;
+                }
+            }
+            "F" => {
+                self.front.transpose();
+                let tmp1 = self.up.0[6];
+                let tmp2 = self.up.0[7];
+                let tmp3 = self.up.0[8];
+                self.up.0[6] = self.left.0[8];
+                self.up.0[7] = self.left.0[5];
+                self.up.0[8] = self.left.0[2];
+                self.left.0[2] = self.down.0[0];
+                self.left.0[5] = self.down.0[1];
+                self.left.0[8] = self.down.0[2];
+                self.down.0[0] = self.right.0[0];
+                self.down.0[1] = self.right.0[3];
+                self.down.0[2] = self.right.0[6];
+                self.right.0[0] = tmp1;
+                self.right.0[3] = tmp2;
+                self.right.0[6] = tmp3;
+            }
+            "B" => {
+                self.back.transpose();
+                let tmp1 = self.up.0[0];
+                let tmp2 = self.up.0[1];
+                let tmp3 = self.up.0[2];
+                self.up.0[0] = self.right.0[2];
+                self.up.0[1] = self.right.0[5];
+                self.up.0[2] = self.right.0[8];
+                self.right.0[2] = self.down.0[6];
+                self.right.0[5] = self.down.0[7];
+                self.right.0[8] = self.down.0[8];
+                self.down.0[6] = self.left.0[0];
+                self.down.0[7] = self.left.0[3];
+                self.down.0[8] = self.left.0[6];
+                self.left.0[0] = tmp3;
+                self.left.0[3] = tmp2;
+                self.left.0[6] = tmp1;
             }
             _ => {
                 unimplemented!();
@@ -162,6 +216,28 @@ mod tests {
     }
 
     #[test]
+    fn test_rotate_clockwise_down() {
+        let mut cube = Cube::default();
+        cube.execute("D");
+
+        let expected_cube = Cube::new(
+            Face([Red, Red, Red, Red, Red, Red, Blue, Blue, Blue]),
+            Face([
+                Orange, Orange, Orange, Orange, Orange, Orange, Green, Green, Green,
+            ]),
+            Face([Blue, Blue, Blue, Blue, Blue, Blue, Orange, Orange, Orange]),
+            Face([Green, Green, Green, Green, Green, Green, Red, Red, Red]),
+            Face([
+                Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow,
+            ]),
+            Face([
+                White, White, White, White, White, White, White, White, White,
+            ]),
+        );
+        assert_eq!(expected_cube, cube);
+    }
+
+    #[test]
     fn test_rotate_clockwise_left() {
         let mut cube = Cube::default();
         cube.execute("L");
@@ -179,6 +255,78 @@ mod tests {
                 Orange, Yellow, Yellow, Orange, Yellow, Yellow, Orange, Yellow, Yellow,
             ]),
             Face([Red, White, White, Red, White, White, Red, White, White]),
+        );
+        assert_eq!(expected_cube, cube);
+    }
+
+    #[test]
+    fn test_rotate_clockwise_right() {
+        let mut cube = Cube::default();
+        cube.execute("R");
+
+        let expected_cube = Cube::new(
+            Face([Red, Red, White, Red, Red, White, Red, Red, White]),
+            Face([
+                Yellow, Orange, Orange, Yellow, Orange, Orange, Yellow, Orange, Orange,
+            ]),
+            Face([Blue, Blue, Blue, Blue, Blue, Blue, Blue, Blue, Blue]),
+            Face([
+                Green, Green, Green, Green, Green, Green, Green, Green, Green,
+            ]),
+            Face([
+                Yellow, Yellow, Red, Yellow, Yellow, Red, Yellow, Yellow, Red,
+            ]),
+            Face([
+                White, White, Orange, White, White, Orange, White, White, Orange,
+            ]),
+        );
+        assert_eq!(expected_cube, cube);
+    }
+
+    #[test]
+    fn test_rotate_clockwise_front() {
+        let mut cube = Cube::default();
+        cube.execute("F");
+
+        let expected_cube = Cube::new(
+            Face([Red, Red, Red, Red, Red, Red, Red, Red, Red]),
+            Face([
+                Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange,
+            ]),
+            Face([Blue, Blue, White, Blue, Blue, White, Blue, Blue, White]),
+            Face([
+                Yellow, Green, Green, Yellow, Green, Green, Yellow, Green, Green,
+            ]),
+            Face([
+                Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Blue, Blue, Blue,
+            ]),
+            Face([
+                Green, Green, Green, White, White, White, White, White, White,
+            ]),
+        );
+        assert_eq!(expected_cube, cube);
+    }
+    
+    #[test]
+    fn test_rotate_clockwise_back() {
+        let mut cube = Cube::default();
+        cube.execute("B");
+
+        let expected_cube = Cube::new(
+            Face([Red, Red, Red, Red, Red, Red, Red, Red, Red]),
+            Face([
+                Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange,
+            ]),
+            Face([Yellow, Blue, Blue, Yellow, Blue, Blue, Yellow, Blue, Blue]),
+            Face([
+                Green, Green, White, Green, Green, White, Green, Green, White,
+            ]),
+            Face([
+                Green, Green, Green, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, 
+            ]),
+            Face([
+                White, White, White, White, White, White, Blue,Blue,Blue,
+            ]),
         );
         assert_eq!(expected_cube, cube);
     }
