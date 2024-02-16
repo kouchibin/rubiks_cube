@@ -69,9 +69,9 @@ impl Cube {
         }
     }
 
-    fn execute(&mut self, sequence: &str) {
-        match sequence {
-            "U" => {
+    fn rotate(&mut self, orientation: char) {
+        match orientation {
+            'U' => {
                 self.up.transpose();
                 for i in [0, 1, 2] {
                     let tmp = self.front.0[i];
@@ -81,7 +81,7 @@ impl Cube {
                     self.left.0[i] = tmp;
                 }
             }
-            "D" => {
+            'D' => {
                 self.down.transpose();
                 for i in [6, 7, 8] {
                     let tmp = self.front.0[i];
@@ -91,7 +91,7 @@ impl Cube {
                     self.right.0[i] = tmp;
                 }
             }
-            "L" => {
+            'L' => {
                 self.left.transpose();
                 for i in [0, 3, 6] {
                     let tmp = self.front.0[i];
@@ -101,7 +101,7 @@ impl Cube {
                     self.down.0[i] = tmp;
                 }
             }
-            "R" => {
+            'R' => {
                 self.right.transpose();
                 for i in [2, 5, 8] {
                     let tmp = self.front.0[i];
@@ -111,7 +111,7 @@ impl Cube {
                     self.up.0[i] = tmp;
                 }
             }
-            "F" => {
+            'F' => {
                 self.front.transpose();
                 let tmp1 = self.up.0[6];
                 let tmp2 = self.up.0[7];
@@ -129,7 +129,7 @@ impl Cube {
                 self.right.0[3] = tmp2;
                 self.right.0[6] = tmp3;
             }
-            "B" => {
+            'B' => {
                 self.back.transpose();
                 let tmp1 = self.up.0[0];
                 let tmp2 = self.up.0[1];
@@ -146,6 +146,14 @@ impl Cube {
                 self.left.0[0] = tmp3;
                 self.left.0[3] = tmp2;
                 self.left.0[6] = tmp1;
+            }
+            'u' | 'd' | 'l' | 'r' | 'f' | 'b' => {
+                // Rotate counter clockwise, which is the same as
+                // rotating clockwise 3 times.
+                let orientation = orientation.to_ascii_uppercase();
+                for _ in 0..3 {
+                    self.rotate(orientation);
+                }
             }
             _ => {
                 unimplemented!();
@@ -194,7 +202,7 @@ mod tests {
     #[test]
     fn test_rotate_clockwise_up() {
         let mut cube = Cube::default();
-        cube.execute("U");
+        cube.rotate('U');
 
         let expected_cube = Cube::new(
             Face([Green, Green, Green, Red, Red, Red, Red, Red, Red]),
@@ -218,7 +226,7 @@ mod tests {
     #[test]
     fn test_rotate_clockwise_down() {
         let mut cube = Cube::default();
-        cube.execute("D");
+        cube.rotate('D');
 
         let expected_cube = Cube::new(
             Face([Red, Red, Red, Red, Red, Red, Blue, Blue, Blue]),
@@ -240,7 +248,7 @@ mod tests {
     #[test]
     fn test_rotate_clockwise_left() {
         let mut cube = Cube::default();
-        cube.execute("L");
+        cube.rotate('L');
 
         let expected_cube = Cube::new(
             Face([Yellow, Red, Red, Yellow, Red, Red, Yellow, Red, Red]),
@@ -262,7 +270,7 @@ mod tests {
     #[test]
     fn test_rotate_clockwise_right() {
         let mut cube = Cube::default();
-        cube.execute("R");
+        cube.rotate('R');
 
         let expected_cube = Cube::new(
             Face([Red, Red, White, Red, Red, White, Red, Red, White]),
@@ -286,7 +294,7 @@ mod tests {
     #[test]
     fn test_rotate_clockwise_front() {
         let mut cube = Cube::default();
-        cube.execute("F");
+        cube.rotate('F');
 
         let expected_cube = Cube::new(
             Face([Red, Red, Red, Red, Red, Red, Red, Red, Red]),
@@ -310,7 +318,7 @@ mod tests {
     #[test]
     fn test_rotate_clockwise_back() {
         let mut cube = Cube::default();
-        cube.execute("B");
+        cube.rotate('B');
 
         let expected_cube = Cube::new(
             Face([Red, Red, Red, Red, Red, Red, Red, Red, Red]),
@@ -326,6 +334,30 @@ mod tests {
             ]),
             Face([
                 White, White, White, White, White, White, Blue,Blue,Blue,
+            ]),
+        );
+        assert_eq!(expected_cube, cube);
+    }
+
+    #[test]
+    fn test_rotate_counter_clockwise_up() {
+        let mut cube = Cube::default();
+        cube.rotate('u');
+
+        let expected_cube = Cube::new(
+            Face([Blue, Blue, Blue, Red, Red, Red, Red, Red, Red]),
+            Face([
+                Green, Green, Green, Orange, Orange, Orange, Orange, Orange, Orange,
+            ]),
+            Face([Orange, Orange, Orange, Blue, Blue, Blue, Blue, Blue, Blue]),
+            Face([
+                Red, Red, Red, Green, Green, Green, Green, Green, Green,
+            ]),
+            Face([
+                Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow,
+            ]),
+            Face([
+                White, White, White, White, White, White, White, White, White,
             ]),
         );
         assert_eq!(expected_cube, cube);
