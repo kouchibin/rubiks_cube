@@ -58,7 +58,6 @@ impl Cube {
         )
     }
 
-
     fn execute(&mut self, sequence: &str) {
         for orientation in sequence.chars() {
             self.rotate(orientation);
@@ -92,8 +91,8 @@ impl Cube {
                 for i in [0, 3, 6] {
                     let tmp = self.front.0[i];
                     self.front.0[i] = self.up.0[i];
-                    self.up.0[i] = self.back.0[8-i];
-                    self.back.0[8-i] = self.down.0[i];
+                    self.up.0[i] = self.back.0[8 - i];
+                    self.back.0[8 - i] = self.down.0[i];
                     self.down.0[i] = tmp;
                 }
             }
@@ -102,8 +101,8 @@ impl Cube {
                 for i in [2, 5, 8] {
                     let tmp = self.front.0[i];
                     self.front.0[i] = self.down.0[i];
-                    self.down.0[i] = self.back.0[8-i];
-                    self.back.0[8-i] = self.up.0[i];
+                    self.down.0[i] = self.back.0[8 - i];
+                    self.back.0[8 - i] = self.up.0[i];
                     self.up.0[i] = tmp;
                 }
             }
@@ -118,9 +117,9 @@ impl Cube {
                 self.left.0[2] = self.down.0[0];
                 self.left.0[5] = self.down.0[1];
                 self.left.0[8] = self.down.0[2];
-                self.down.0[0] = self.right.0[0];
+                self.down.0[0] = self.right.0[6];
                 self.down.0[1] = self.right.0[3];
-                self.down.0[2] = self.right.0[6];
+                self.down.0[2] = self.right.0[0];
                 self.right.0[0] = tmp1;
                 self.right.0[3] = tmp2;
                 self.right.0[6] = tmp3;
@@ -133,9 +132,9 @@ impl Cube {
                 self.up.0[0] = self.right.0[2];
                 self.up.0[1] = self.right.0[5];
                 self.up.0[2] = self.right.0[8];
-                self.right.0[2] = self.down.0[6];
+                self.right.0[2] = self.down.0[8];
                 self.right.0[5] = self.down.0[7];
-                self.right.0[8] = self.down.0[8];
+                self.right.0[8] = self.down.0[6];
                 self.down.0[6] = self.left.0[0];
                 self.down.0[7] = self.left.0[3];
                 self.down.0[8] = self.left.0[6];
@@ -162,6 +161,8 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
+    use rand::random;
+
     use super::*;
 
     #[test]
@@ -310,7 +311,7 @@ mod tests {
         );
         assert_eq!(expected_cube, cube);
     }
-    
+
     #[test]
     fn test_rotate_clockwise_back() {
         let mut cube = Cube::default();
@@ -326,11 +327,9 @@ mod tests {
                 Green, Green, White, Green, Green, White, Green, Green, White,
             ]),
             Face([
-                Green, Green, Green, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, 
+                Green, Green, Green, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow,
             ]),
-            Face([
-                White, White, White, White, White, White, Blue,Blue,Blue,
-            ]),
+            Face([White, White, White, White, White, White, Blue, Blue, Blue]),
         );
         assert_eq!(expected_cube, cube);
     }
@@ -346,9 +345,7 @@ mod tests {
                 Green, Green, Green, Orange, Orange, Orange, Orange, Orange, Orange,
             ]),
             Face([Orange, Orange, Orange, Blue, Blue, Blue, Blue, Blue, Blue]),
-            Face([
-                Red, Red, Red, Green, Green, Green, Green, Green, Green,
-            ]),
+            Face([Red, Red, Red, Green, Green, Green, Green, Green, Green]),
             Face([
                 Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow,
             ]),
@@ -367,20 +364,44 @@ mod tests {
         let expected_cube = Cube::new(
             Face([Red, Red, Red, Blue, Red, Green, Red, Red, Red]),
             Face([
-                Orange, Orange, Orange, Green, Orange, Blue, Orange, Orange, Orange 
+                Orange, Orange, Orange, Green, Orange, Blue, Orange, Orange, Orange,
             ]),
             Face([Blue, White, Blue, Red, Blue, Orange, Blue, Yellow, Blue]),
             Face([
-                Green, White, Green, Orange, Green, Red, Green, Yellow, Green
+                Green, White, Green, Orange, Green, Red, Green, Yellow, Green,
             ]),
             Face([
                 Yellow, Yellow, Yellow, Blue, Yellow, Green, Yellow, Yellow, Yellow,
             ]),
-            Face([
-                White, White, White, Blue, White, Green, White, White, White,
-            ]),
+            Face([White, White, White, Blue, White, Green, White, White, White]),
         );
         assert_eq!(expected_cube, cube);
     }
 
+    #[test]
+    fn test_execute_sequence_random() {
+        use rand::seq::IteratorRandom;
+        let mut rng = rand::thread_rng();
+        let mut random_sequence = String::new();
+        for _ in 0..1000 {
+            let o = "UDLRFBudlrfb".chars().choose(&mut rng).unwrap();
+            random_sequence.push(o);
+        }
+
+        let mut cube = Cube::default();
+        cube.execute(&random_sequence);
+
+        let mut reversed_sequence = String::new();
+        for o in random_sequence.chars().rev() {
+            let reversed = if o.is_ascii_lowercase() {
+                o.to_ascii_uppercase()
+            } else {
+                o.to_ascii_lowercase()
+            };
+            reversed_sequence.push(reversed);
+        }
+        cube.execute(&reversed_sequence);
+
+        assert_eq!(Cube::default(), cube);
+    }
 }
