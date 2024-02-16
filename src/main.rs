@@ -58,14 +58,10 @@ impl Cube {
         )
     }
 
-    fn adjacent_faces(color: Color) -> [Color; 4] {
-        match color {
-            Yellow => [Red, Blue, Orange, Green],
-            Blue => [Yellow, Red, White, Orange],
-            Red => [Yellow, Green, White, Blue],
-            Orange => [Yellow, Blue, White, Green],
-            White => [Red, Green, Orange, Blue],
-            Green => [Yellow, Orange, White, Red],
+
+    fn execute(&mut self, sequence: &str) {
+        for orientation in sequence.chars() {
+            self.rotate(orientation);
         }
     }
 
@@ -96,8 +92,8 @@ impl Cube {
                 for i in [0, 3, 6] {
                     let tmp = self.front.0[i];
                     self.front.0[i] = self.up.0[i];
-                    self.up.0[i] = self.back.0[i + 2];
-                    self.back.0[i + 2] = self.down.0[i];
+                    self.up.0[i] = self.back.0[8-i];
+                    self.back.0[8-i] = self.down.0[i];
                     self.down.0[i] = tmp;
                 }
             }
@@ -106,8 +102,8 @@ impl Cube {
                 for i in [2, 5, 8] {
                     let tmp = self.front.0[i];
                     self.front.0[i] = self.down.0[i];
-                    self.down.0[i] = self.back.0[i - 2];
-                    self.back.0[i - 2] = self.up.0[i];
+                    self.down.0[i] = self.back.0[8-i];
+                    self.back.0[8-i] = self.up.0[i];
                     self.up.0[i] = tmp;
                 }
             }
@@ -362,4 +358,29 @@ mod tests {
         );
         assert_eq!(expected_cube, cube);
     }
+
+    #[test]
+    fn test_execute_sequence() {
+        let mut cube = Cube::default();
+        cube.execute("UDLRFBudlrfb");
+
+        let expected_cube = Cube::new(
+            Face([Red, Red, Red, Blue, Red, Green, Red, Red, Red]),
+            Face([
+                Orange, Orange, Orange, Green, Orange, Blue, Orange, Orange, Orange 
+            ]),
+            Face([Blue, White, Blue, Red, Blue, Orange, Blue, Yellow, Blue]),
+            Face([
+                Green, White, Green, Orange, Green, Red, Green, Yellow, Green
+            ]),
+            Face([
+                Yellow, Yellow, Yellow, Blue, Yellow, Green, Yellow, Yellow, Yellow,
+            ]),
+            Face([
+                White, White, White, Blue, White, Green, White, White, White,
+            ]),
+        );
+        assert_eq!(expected_cube, cube);
+    }
+
 }
